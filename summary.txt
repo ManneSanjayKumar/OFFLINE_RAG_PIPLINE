@@ -1,0 +1,4 @@
+Machine Learning (ML) is a branch of Artificial Intelligence (AI) that focuses on building systems that can learn from data and make decisions or predictions without being explicitly programmed.
+
+🔹 Key Idea:
+Instead of writing code with specific rules, we train models using data so they can learn patterns and make predictions.

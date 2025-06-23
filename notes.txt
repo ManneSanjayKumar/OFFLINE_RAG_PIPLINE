@@ -1,0 +1,20 @@
+Python is a high-level, interpreted programming language known for its simplicity, readability, and versatility. It was created by Guido van Rossum and first released in 1991.
+
+🔹 Key Features of Python:
+Easy to Read and Write
+Python syntax is similar to English, which makes it beginner-friendly.
+
+Interpreted Language
+Python code is executed line by line, making debugging easier.
+
+Dynamically Typed
+No need to declare variable types; Python figures it out automatically.
+
+Object-Oriented
+Python supports object-oriented programming (OOP) concepts like classes and inheritance.
+
+Extensive Libraries
+Python has thousands of libraries (like pandas, numpy, matplotlib, etc.) that make tasks easier.
+
+Cross-Platform
+Python code can run on different operating systems (Windows, Linux, Mac) without changes.
