@@ -1,0 +1,291 @@
+                                OFFLINE RAG PIPLINE
+
+Step 1: Open/Create a Project in PyCharm
+
+1. Open PyCharm.
+2. Click on "New Project" or open an existing one.
+3. Choose a directory for your project (e.g., `LangChain_QA_Project`).
+
+
+
+Step 2: Setup Project Structure
+
+Inside your project directory, create the following structure:
+
+```
+LangChain_QA_Project/
+│
+├── app.py                ← Your main Python script
+├── documents/            ← Folder containing your .txt files
+│   ├── file1.txt
+│   └── file2.txt
+└── requirements.txt      ← (optional) dependencies file
+```
+
+
+# 📦 Step 3: Install Required Packages
+
+In PyCharm:
+
+1. Go to **File > Settings > Project: > Python Interpreter**.
+2. Click the `+` button to install the following packages:
+
+```
+langchain
+langchain-community
+langchain-huggingface
+chromadb
+sentence-transformers
+```
+
+>  Or you can open the terminal in PyCharm (bottom panel) and run:
+
+```bash
+pip install langchain langchain-community langchain-huggingface chromadb sentence-transformers
+```
+
+
+
+ Step 4: Paste Your Code into `app.py`
+
+Copy your LangChain script into `app.py`.
+
+Step 5: Run the Script
+
+1. Right-click on `app.py`.
+2. Select **"Run 'app'"**.
+
+> PyCharm will run the script in the console window.
+
+You’ll see:
+
+
+🔎 Ask your question:
+```
+
+Type your question and press Enter.
+
+You'll get:
+
+* ✅ Top 3 matching text chunks
+* ✅ Their source file names
+
+
+
+# Optional: Add `requirements.txt`
+
+To keep track of dependencies:
+
+```txt
+langchain
+langchain-community
+langchain-huggingface
+chromadb
+sentence-transformers
+```
+
+Then run:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+
+
+# Final Tip: Run with Debugging
+
+Set breakpoints (click left of line number) and run in **debug mode** to inspect:
+
+* `docs`, `chunks`, `vectorstore` objects
+* Embeddings and retrieved results
+
+
+
+
+#✅ Project Objective
+
+This project builds a **local question-answering system** using:
+
+* `.txt` documents in a folder
+* Sentence embeddings from Hugging Face (`all-MiniLM-L6-v2`)
+* Chroma as the vector store
+* LangChain tools to process and search documents
+
+🧠User types a question → System finds the most relevant parts of the documents → Shows relevant text chunks and source file names.
+
+---
+
+#Required Packages & Installation
+
+Install all required packages via pip:
+
+```bash
+pip install langchain langchain-community langchain-huggingface chromadb sentence-transformers
+```
+
+### Breakdown:
+
+ Package                 | Purpose                                                     
+ ----------------------- | ----------------------------------------------------------- 
+ `langchain`             | Core framework for chaining LLM components                  
+ `langchain-community`   | Access to community-maintained loaders (e.g., `TextLoader`) 
+ `langchain-huggingface` | Interface for HuggingFace embeddings                        
+ `chromadb`              | Local vector database                                        `sentence-transformers` | HuggingFace sentence embedding models                       
+
+
+
+## Line-by-Line Explanation
+
+```python
+import os
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+```
+
+* `os`: For file and folder operations.
+* `TextLoader`: Loads plain text files into LangChain `Document` format.
+* `RecursiveCharacterTextSplitter`: Splits long texts into smaller chunks with overlap.
+* `Chroma`: Vector storage backend used to store and search embedded chunks.
+* `HuggingFaceEmbeddings`: Loads HuggingFace model for sentence embeddings.
+
+
+
+  Step-by-Step Process
+
+---
+
+ ✅ Step 1: Load all `.txt` files from `documents/` folder
+
+```python
+folder_path = "documents"
+docs = []
+for file in os.listdir(folder_path):
+    if file.endswith(".txt"):
+        loader = TextLoader(os.path.join(folder_path, file))
+        docs.extend(loader.load())
+
+
+* Sets the folder path.
+* Loops through all files in the folder.
+* If file is `.txt`, it loads the text using `TextLoader`.
+* `loader.load()` returns a list of `Document` objects.
+
+
+
+### ✅ Step 2: Split long documents into smaller chunks
+
+```python
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+chunks = splitter.split_documents(docs)
+```
+
+* Splits text into overlapping chunks of 500 characters.
+* 50 characters of overlap ensures context continuity.
+* This makes semantic search more accurate.
+
+
+
+# Step 3: Load sentence transformer model for embeddings
+
+```python
+embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+```
+
+* Loads the `"all-MiniLM-L6-v2"` model from Hugging Face.
+* Converts text chunks into numerical vectors (embeddings).
+* Light, fast, and high-performing for local QA.
+
+
+# ✅ Step 4: Create a vector store using Chroma
+
+```python
+vectorstore = Chroma.from_documents(chunks, embedding_model)
+```
+
+* Embeds all chunks and stores them in Chroma vector DB.
+* Allows similarity search based on user queries.
+
+
+
+# ✅ Step 5: Take user input query
+
+```python
+query = input("🔎 Ask your question: ")
+```
+
+* Takes a question from the user via console input.
+
+
+
+### ✅ Step 6: Retrieve top matching document chunks
+
+```python
+retriever = vectorstore.as_retriever()
+docs = retriever.get_relevant_documents(query)
+```
+
+* Converts vector store into a retriever object.
+* Finds top matching chunks for the user's query.
+
+
+
+### ✅ Step 7: Display top 3 relevant chunks
+
+```python
+print("\n🧠 Top Results from Documents:\n")
+for i, doc in enumerate(docs[:3], 1):
+    print(f"[{i}] {doc.page_content.strip()}\n")
+
+
+* Shows the top 3 results with content that matches the question.
+* `doc.page_content` is the actual text chunk.
+
+
+### ✅ Step 8: Display source filenames
+
+```python
+print("\n📄 Source Files:")
+for doc in docs[:3]:
+    print("-", doc.metadata["source"])
+
+
+* Each `Document` stores file metadata (`source` = filename).
+* Shows which files the answers came from.
+
+
+
+## Execution Process in Steps
+
+1. Create your folder:
+   Put `.txt` files inside a folder named `documents/`.
+
+2. Create Python file:
+   Save the script above as `app.py`.
+
+3. Install packages:
+
+   ```bash
+   pip install langchain langchain-community langchain-huggingface chromadb sentence-transformers
+   
+
+
+
+5. Ask questions:
+   Type your question and it will return top matches from your documents.
+
+
+
+##  Summary
+
+You’ve built a simple yet powerful local semantic search QA system using:
+
+* 🧾 Text documents
+* 🧠 Sentence transformer embeddings
+* 🗃️ Chroma vector DB
+* 🧩 LangChain framework
+
+
